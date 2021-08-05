@@ -24,6 +24,9 @@
             <form id="editUser" name="editUser" action="/app/useredit" method="post">
                 <fieldset>
                     <h3> Update User Information </h3><br>
+
+                    <!-- SOLUTION : Ajout du token dans le formulaire -->
+                    <input type="hidden" name="_csrf" value="<%= _csrfToken %>">
                     
                     <input type="hidden" name="id" value="<%= userId %>" id="editUser_userId" />
                     

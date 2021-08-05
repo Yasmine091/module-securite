@@ -101,12 +101,14 @@ module.exports.productSearch = function (req, res) {
 	})
 }
 
+// SOLUTION : Envoi du token dans le formulaire
 module.exports.modifyProduct = function (req, res) {
 	if (!req.query.id || req.query.id == '') {
 		output = {
 			product: {}
 		}
 		res.render('app/modifyproduct', {
+			_csrfToken: req.csrfToken(),
 			output: output
 		})
 	} else {
@@ -122,12 +124,14 @@ module.exports.modifyProduct = function (req, res) {
 				product: product
 			}
 			res.render('app/modifyproduct', {
+				_csrfToken: req.csrfToken(),
 				output: output
 			})
 		})
 	}
 }
 
+// SOLUTION : Récuperation et vérification du token du formulaire
 module.exports.modifyProductSubmit = function (req, res) {
 	if (!req.body.id || req.body.id == '') {
 		req.body.id = 0
@@ -155,20 +159,24 @@ module.exports.modifyProductSubmit = function (req, res) {
 			}
 			req.flash('danger',err)
 			res.render('app/modifyproduct', {
+				_csrfToken: req.csrfToken(),
 				output: output
 			})
 		})
 	})
 }
 
+// SOLUTION : Envoi du token dans le formulaire
 module.exports.userEdit = function (req, res) {
 	res.render('app/useredit', {
+		_csrfToken: req.csrfToken(),
 		userId: req.user.id,
 		userEmail: req.user.email,
 		userName: req.user.name
 	})
 }
 
+// SOLUTION : Récuperation et vérification du token du formulaire
 module.exports.userEditSubmit = function (req, res) {
 	db.User.find({
 		where: {
@@ -182,6 +190,7 @@ module.exports.userEditSubmit = function (req, res) {
 				}else{
 					req.flash('warning', 'Passwords dont match')
 					res.render('app/useredit', {
+						_csrfToken: req.csrfToken(),
 						userId: req.user.id,
 						userEmail: req.user.email,
 						userName: req.user.name,
@@ -191,6 +200,7 @@ module.exports.userEditSubmit = function (req, res) {
 			}else{
 				req.flash('warning', 'Invalid Password')
 				res.render('app/useredit', {
+					_csrfToken: req.csrfToken(),
 					userId: req.user.id,
 					userEmail: req.user.email,
 					userName: req.user.name,
@@ -203,6 +213,7 @@ module.exports.userEditSubmit = function (req, res) {
 		user.save().then(function () {
 			req.flash('success',"Updated successfully")
 			res.render('app/useredit', {
+				_csrfToken: req.csrfToken(),
 				userId: req.body.id,
 				userEmail: req.body.email,
 				userName: req.body.name,

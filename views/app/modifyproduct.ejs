@@ -28,6 +28,9 @@
     <form id="addEditProduct" name="addEditProduct" action="/app/modifyproduct" method="post">
         <fieldset>
 
+            <!-- SOLUTION : Ajout du token dans le formulaire -->
+            <input type="hidden" name="_csrf" value="<%= _csrfToken %>">
+
             <input type="hidden" name="id" value="<%= output.product.id %>" id="addEditProduct_product_id" />
 
             <div class="form-group ">
