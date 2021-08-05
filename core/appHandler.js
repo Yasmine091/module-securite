@@ -71,17 +71,29 @@ module.exports.listProducts = function (req, res) {
 	})
 }
 
+function escapeHtml(unsafe) {
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+ }
+
+// FAILLE PASSE PAR LA : <script>alert('heehee');</script>
+// Solution, créer une fonction pour échapper les caractèeres HTML lors de la recherche
+
 module.exports.productSearch = function (req, res) {
 	db.Product.findAll({
 		where: {
 			name: {
-				[Op.like]: '%' + req.body.name + '%'
+				[Op.like]: '%' + escapeHtml(req.body.name) + '%'
 			}
 		}
 	}).then(products => {
 		output = {
 			products: products,
-			searchTerm: req.body.name
+			searchTerm: escapeHtml(req.body.name)
 		}
 		res.render('app/products', {
 			output: output
@@ -128,10 +140,10 @@ module.exports.modifyProductSubmit = function (req, res) {
 		if (!product) {
 			product = new db.Product()
 		}
-		product.code = req.body.code
-		product.name = req.body.name
-		product.description = req.body.description
-		product.tags = req.body.tags
+		product.code = escapeHtml(req.body.code)
+		product.name = escapeHtml(req.body.name)
+		product.description = escapeHtml(req.body.description)
+		product.tags = escapeHtml(req.body.tags)
 		product.save().then(p => {
 			if (p) {
 				req.flash('success', 'Product added/modified!')
