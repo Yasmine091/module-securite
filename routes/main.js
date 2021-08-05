@@ -1,8 +1,21 @@
+var express = require('express')
 var router = require('express').Router()
 var vulnDict = require('../config/vulns')
 var authHandler = require('../core/authHandler')
+const rateLimit = require("express-rate-limit");
 
 module.exports = function (passport) {
+
+	// SOLUTION : Limiter les appels par l'utilisateur avec express-rate-limit
+	router.use(express.json({ limit: '10kb' })); // Body limit is 10
+
+	const limiter = rateLimit({
+		windowMs: 15 * 60 * 1000, // 15 minutes
+		max: 100 // limit each IP to 100 requests per windowMs
+	});
+
+	router.use(limiter);
+
 	router.get('/', authHandler.isAuthenticated, function (req, res) {
 		res.redirect('/learn')
 	})
