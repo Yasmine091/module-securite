@@ -38,15 +38,23 @@ module.exports = function () {
     })
 
     router.get('/admin', authHandler.isAuthenticated, function (req, res) {
-        res.render('app/admin', {
-            admin: (req.user.role == 'admin')
-        })
+        // SOLUTION : Condition, si l'user n'est pas admin il sera redirigé
+        if(req.user.role == 'admin'){
+            res.render('app/admin')
+        } else {
+            res.redirect('/');
+        }
     })
 
     router.get('/admin/usersapi', authHandler.isAuthenticated, appHandler.listUsersAPI)
 
     router.get('/admin/users', authHandler.isAuthenticated, function(req, res){
-        res.render('app/adminusers')
+        // SOLUTION : Condition, si l'user n'est pas admin il sera redirigé
+        if(req.user.role == 'admin'){
+            res.render('app/adminusers')
+        } else {
+            res.redirect('/');
+        }
     })
 
     router.get('/redirect', appHandler.redirect)

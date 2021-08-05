@@ -168,58 +168,68 @@ module.exports.modifyProductSubmit = function (req, res) {
 
 // SOLUTION : Envoi du token dans le formulaire
 module.exports.userEdit = function (req, res) {
-	res.render('app/useredit', {
-		_csrfToken: req.csrfToken(),
-		userId: req.user.id,
-		userEmail: req.user.email,
-		userName: req.user.name
-	})
+	// SOLUTION : Condition, si l'user n'est pas admin il sera redirigé
+	if(req.user.role == 'admin'){
+		res.render('app/useredit', {
+			_csrfToken: req.csrfToken(),
+			userId: req.user.id,
+			userEmail: req.user.email,
+			userName: req.user.name
+		})
+	} else {
+		res.redirect('../../');
+	}
 }
 
 // SOLUTION : Récuperation et vérification du token du formulaire
 module.exports.userEditSubmit = function (req, res) {
-	db.User.find({
-		where: {
-			'id': req.body.id
-		}		
-	}).then(user =>{
-		if(req.body.password.length>0){
+	// SOLUTION : Condition, si l'user n'est pas admin il sera redirigé
+	if(req.user.role == 'admin'){
+		db.User.find({
+			where: {
+				'id': req.body.id
+			}		
+		}).then(user =>{
 			if(req.body.password.length>0){
-				if (req.body.password == req.body.cpassword) {
-					user.password = md5(req.body.password)
+				if(req.body.password.length>0){
+					if (req.body.password == req.body.cpassword) {
+						user.password = md5(req.body.password)
+					}else{
+						req.flash('warning', 'Passwords dont match')
+						res.render('app/useredit', {
+							_csrfToken: req.csrfToken(),
+							userId: req.user.id,
+							userEmail: req.user.email,
+							userName: req.user.name,
+						})
+						return		
+					}
 				}else{
-					req.flash('warning', 'Passwords dont match')
+					req.flash('warning', 'Invalid Password')
 					res.render('app/useredit', {
 						_csrfToken: req.csrfToken(),
 						userId: req.user.id,
 						userEmail: req.user.email,
 						userName: req.user.name,
 					})
-					return		
+					return
 				}
-			}else{
-				req.flash('warning', 'Invalid Password')
+			}
+			user.email = req.body.email
+			user.name = req.body.name
+			user.save().then(function () {
+				req.flash('success',"Updated successfully")
 				res.render('app/useredit', {
 					_csrfToken: req.csrfToken(),
-					userId: req.user.id,
-					userEmail: req.user.email,
-					userName: req.user.name,
+					userId: req.body.id,
+					userEmail: req.body.email,
+					userName: req.body.name,
 				})
-				return
-			}
-		}
-		user.email = req.body.email
-		user.name = req.body.name
-		user.save().then(function () {
-			req.flash('success',"Updated successfully")
-			res.render('app/useredit', {
-				_csrfToken: req.csrfToken(),
-				userId: req.body.id,
-				userEmail: req.body.email,
-				userName: req.body.name,
 			})
 		})
-	})
+	} else {
+		res.redirect('../../');
+	}
 }
 
 module.exports.redirect = function (req, res) {
@@ -243,12 +253,17 @@ module.exports.calc = function (req, res) {
 }
 
 module.exports.listUsersAPI = function (req, res) {
-	db.User.findAll({}).then(users => {
-		res.status(200).json({
-			success: true,
-			users: users
+	// SOLUTION : Condition, si l'user n'est pas admin il sera redirigé
+	if(req.user.role == 'admin'){
+		db.User.findAll({}).then(users => {
+			res.status(200).json({
+				success: true,
+				users: users
+			})
 		})
-	})
+	} else {
+		res.redirect('../../');
+	}
 }
 
 module.exports.bulkProductsLegacy = function (req,res){
