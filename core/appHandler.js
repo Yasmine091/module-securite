@@ -7,8 +7,16 @@ var serialize = require("node-serialize")
 const Op = db.Sequelize.Op
 
 module.exports.userSearch = function (req, res) {
+	/* FAILLE
 	var query = "SELECT name,id FROM Users WHERE login='" + req.body.login + "'";
 	db.sequelize.query(query, {
+	*/
+	
+	// INJECTION PASSE PAR LA : ' OR '1' = '1' UNION SELECT password,id FROM Users WHERE id = 1 ORDER BY 1; -- -
+	
+	// SOLUTION faire une requête préparé avec le paramètre req.body.login
+	var query = "SELECT name,id FROM Users WHERE login = ?";
+	db.sequelize.query(query, { replacements: [req.body.login], type: db.sequelize.QueryTypes.SELECT }, {
 		model: db.User
 	}).then(user => {
 		if (user.length) {
@@ -35,8 +43,16 @@ module.exports.userSearch = function (req, res) {
 	})
 }
 
+
 module.exports.ping = function (req, res) {
-	exec('ping -c 2 ' + req.body.address, function (err, stdout, stderr) {
+	/* FAILLE
+	exec('ping -c 2 ' + req.body.address, function (err, stdout, stderr) {	
+	*/
+
+	// INJECTION PASSE PAR LA : 0.0.0.0 & >cat GROSSEFAILLE!!!!!!/muahaha.txt & code GROSSEFAILLE!!!!!!/muahaha.txt
+
+	// SOLUTION échapper les caractères non numeriques et symboles
+	exec('ping -c 2 ' + req.body.address.replace(/([^0-9.])/g, ''), function (err, stdout, stderr) {
 		output = stdout + stderr
 		res.render('app/ping', {
 			output: output

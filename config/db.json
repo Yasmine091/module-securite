@@ -1,7 +1,7 @@
 {
-    "MYSQL_USER": "toto",
-    "MYSQL_DATABASE": "toto",
-    "MYSQL_PASSWORD": "toto",
-    "MYSQL_HOST": "127.0.0.1",
+    "MYSQL_USER": "root",
+    "MYSQL_DATABASE": "module-securite",
+    "MYSQL_PASSWORD": "yas09",
+    "MYSQL_HOST": "localhost",
     "MYSQL_PORT": "3306"
 }
